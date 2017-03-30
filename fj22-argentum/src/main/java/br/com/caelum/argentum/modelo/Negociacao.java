@@ -2,7 +2,6 @@ package br.com.caelum.argentum.modelo;
 
 import java.util.Calendar;
 
-@XmlRootElement
 public final class Negociacao implements Comparable<Negociacao> {
 	// Variables
 	private final double preco;
