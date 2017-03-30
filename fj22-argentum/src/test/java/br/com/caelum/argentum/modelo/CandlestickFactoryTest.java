@@ -105,5 +105,78 @@ public class CandlestickFactoryTest {
 		assertEquals(50.0, candle.getMaximo(), 0.00001);
 		assertEquals(17000.0, candle.getVolume(), 0.00001);
 	}
+	
+	@Test
+	public void paraNegociacoesDeTresDiasDistintosGeraTresCandles() {
+		Calendar hoje = Calendar.getInstance();
+		
+		Negociacao n1 = new Negociacao(40.5, 100, hoje);
+		Negociacao n2 = new Negociacao(45.0, 100, hoje);
+		Negociacao n3 = new Negociacao(39.8, 100, hoje);
+		Negociacao n4 = new Negociacao(42.3, 100, hoje);
+		
+		Calendar amanha = (Calendar) hoje.clone();
+		amanha.add(Calendar.DAY_OF_MONTH, 1);
+		
+		Negociacao n5 = new Negociacao(48.8, 100, amanha);
+		Negociacao n6 = new Negociacao(49.3, 100, amanha);
+		
+		Calendar depois = (Calendar) amanha.clone();
+		depois.add(Calendar.DAY_OF_MONTH, 1);
+		
+		Negociacao n7 = new Negociacao(51.8, 100, depois);
+		Negociacao n8 = new Negociacao(52.3, 100, depois);
+		
+		List<Negociacao> negociacoes = Arrays.asList(n1, n2, n3, n4, n5, n6, n7, n8);
+		
+		CandlestickFactory fabrica = new CandlestickFactory();
+		List<Candlestick> candles = fabrica.constroiCandles(negociacoes);
+		
+		assertEquals(3, candles.size());
+		assertEquals(40.5, candles.get(0).getAbertura(), 0.00001);
+		assertEquals(42.3, candles.get(0).getFechamento(), 0.00001);
+		assertEquals(48.8, candles.get(1).getAbertura(), 0.00001);
+		assertEquals(49.3, candles.get(1).getFechamento(), 0.00001);
+		assertEquals(51.8, candles.get(2).getAbertura(), 0.00001);
+		assertEquals(52.3, candles.get(2).getFechamento(), 0.00001);
+	}
+	
+	@Test
+	public void naoPermiteConstruirCandlesComNegociacoesForaDeOrdem() {
+Calendar hoje = Calendar.getInstance();
+		
+		Negociacao n1 = new Negociacao(40.5, 100, hoje);
+		Negociacao n2 = new Negociacao(45.0, 100, hoje);
+		Negociacao n3 = new Negociacao(39.8, 100, hoje);
+		Negociacao n4 = new Negociacao(42.3, 100, hoje);
+		
+		Calendar amanha = (Calendar) hoje.clone();
+		amanha.add(Calendar.DAY_OF_MONTH, 1);
+		
+		Negociacao n5 = new Negociacao(48.8, 100, amanha);
+		Negociacao n6 = new Negociacao(49.3, 100, amanha);
+		
+		Calendar depois = (Calendar) amanha.clone();
+		depois.add(Calendar.DAY_OF_MONTH, 1);
+		
+		Negociacao n7 = new Negociacao(51.8, 100, depois);
+		Negociacao n8 = new Negociacao(52.3, 100, depois);
+		
+		// Negociacao fora de ordem
+		Negociacao n0 = new Negociacao(25.0, 100, amanha);
+		
+		List<Negociacao> negociacoes = Arrays.asList(n1, n2, n3, n4, n5, n6, n7, n8, n0);
+		
+		CandlestickFactory fabrica = new CandlestickFactory();
+		List<Candlestick> candles = fabrica.constroiCandles(negociacoes);
+		
+		assertEquals(3, candles.size());
+		assertEquals(40.5, candles.get(0).getAbertura(), 0.00001);
+		assertEquals(42.3, candles.get(0).getFechamento(), 0.00001);
+		assertEquals(48.8, candles.get(1).getAbertura(), 0.00001);
+		assertEquals(25.0, candles.get(1).getFechamento(), 0.00001);
+		assertEquals(51.8, candles.get(2).getAbertura(), 0.00001);
+		assertEquals(52.3, candles.get(2).getFechamento(), 0.00001);
+	}
 
 }
